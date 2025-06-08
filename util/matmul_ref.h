@@ -1,16 +1,41 @@
 #pragma once
 
 #include <math.h>
+#include <cstdlib>
 
-void matmul_ref(float* A, float* B, float* C, int ds){
-    for(int i = 0; i < ds; i++){
-        for(int j = 0; j < ds; j++){
+#define CEIL_DIV(x, y)  (((x) + (y) - 1) / (y))
+
+// error checking macro
+#define cudaCheckErrors(msg) \
+    do { \
+        cudaError_t __err = cudaGetLastError(); \
+        if (__err != cudaSuccess) { \
+            fprintf(stderr, "Fatal error: %s (%s at %s:%d)\n", \
+                msg, cudaGetErrorString(__err), \
+                __FILE__, __LINE__); \
+            fprintf(stderr, "*** FAILED - ABORTING\n"); \
+            exit(1); \
+        } \
+    } while (0)
+
+// shape of A: (M, K)
+// shape of B: (K, N)
+// shape of C: (M, N)
+void matmul_ref(float* C, float* A, float* B, float alpha, float beta, int M, int N, int K){
+    for(int i = 0; i < M; i++){
+        for(int j = 0; j < N; j++){
             float temp = 0;
-            for(int k = 0; k < ds; k++){
-                temp += A[i * ds + k] * B[k * ds + j];
+            for(int k = 0; k < K; k++){
+                temp += A[i * K + k] * B[k * N + j];
             }
-            C[i * ds + j] = temp;
+            C[i * N + j] = alpha * temp + beta * C[i * N + j];
         }
+    }
+}
+
+void init_rand(float* arr, size_t len){
+    for (size_t i = 0; i < len; i++){
+        arr[i] = (rand() - RAND_MAX / 2 ) / (float)RAND_MAX;
     }
 }
 

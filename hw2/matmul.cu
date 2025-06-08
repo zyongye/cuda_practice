@@ -21,7 +21,7 @@
     } while (0)
 
 
-const int DSIZE = 8192;
+const int DSIZE = 512;
 const int block_size = 32;  // CUDA maximum is 1024 *total* threads in block
 
 // matrix multiply (naive) kernel: C = A * B
@@ -83,7 +83,7 @@ int main(){
   }
   // performing reference matmul
 
-  matmul_ref(h_A, h_B, C_ref, DSIZE);
+  matmul_ref(h_A, h_B, C_ref, 1.0, 0, DSIZE, DSIZE, DSIZE);
 
   // Initialization timing
   t1 = clock();
