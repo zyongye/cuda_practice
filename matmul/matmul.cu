@@ -5,10 +5,11 @@
 #include "../util/matmul_ref.h"
 
 #include "./kernels/kernel1.cuh"
+#include "./kernels/kernel2.cuh"
 
-#define M 32
-#define N 32
-#define K 32
+#define M 4096
+#define N 4096
+#define K 4096
 
 int main(){
     float *h_A, *h_B, *h_C, *h_C_ref;
@@ -38,7 +39,8 @@ int main(){
     cudaMemcpy(d_C, h_C, M * N * sizeof(float), cudaMemcpyHostToDevice);
     cudaCheckErrors("Memcpy fails");
 
-    sgemm1(d_C, d_A, d_B, alpha, beta, M, N, K);
+    sgemm2(d_C, d_A, d_B, alpha, beta, M, N, K);
+    cudaCheckErrors("Executing kernel");
 
     cudaMemcpy(h_C, d_C, M * N * sizeof(float), cudaMemcpyDeviceToHost);
     cudaCheckErrors("Memcpy back to host fails");
