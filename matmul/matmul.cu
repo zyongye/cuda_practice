@@ -7,6 +7,7 @@
 #include "./kernels/kernel1.cuh"
 #include "./kernels/kernel2.cuh"
 #include "./kernels/kernel3.cuh"
+#include "./kernels/kernel4.cuh"
 
 #define M 4096
 #define N 4096
@@ -40,7 +41,7 @@ int main(){
     cudaMemcpy(d_C_ref, h_C, M * N * sizeof(float), cudaMemcpyHostToDevice);
     cudaCheckErrors("Memcpy fails");
 
-    sgemm3(d_C, d_A, d_B, alpha, beta, M, N, K);
+    sgemm4(d_C, d_A, d_B, alpha, beta, M, N, K);
     cudaCheckErrors("Error executing kernel");
 
     cudaMemcpy(h_C, d_C, M * N * sizeof(float), cudaMemcpyDeviceToHost);
@@ -49,7 +50,7 @@ int main(){
     printf("Kernel completes\n");
 
     // running reference implementation
-    sgemm2(d_C_ref, d_A, d_B, alpha, beta, M, N, K);
+    sgemm4(d_C_ref, d_A, d_B, alpha, beta, M, N, K);
     cudaCheckErrors("Error executing reference kernel");
 
     cudaMemcpy(h_C_ref, d_C_ref, M * N * sizeof(float), cudaMemcpyDeviceToHost);
