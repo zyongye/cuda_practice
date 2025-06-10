@@ -40,6 +40,8 @@ __global__ void _sgemm5(
     const uint B_stride = thread_num / BN;
 
     float threadResults[TM][TN] = {0.};
+    float regM[TM] = {0.};
+    float regN[TN] = {0.};
 
     #pragma unroll
     for(int k = 0; k < _K; k += BK){
@@ -61,8 +63,14 @@ __global__ void _sgemm5(
         #pragma unroll
         for(size_t dotIdx = 0; dotIdx < BK; ++dotIdx){
             for(int i = 0; i < TM; i++){
+                regM[i] = _As[threadRow * TM + i][dotIdx];
+            }
+            for(int i = 0; i < TN; i++){
+                regN[i] = _Bs[dotIdx][threadCol * TN + i];
+            }
+            for(int i = 0; i < TM; i++){
                 for(int j = 0; j < TN; j++){
-                    threadResults[i][j] += _As[threadRow * TM + i][dotIdx] * _Bs[dotIdx][threadCol * TN + j];
+                    threadResults[i][j] += regM[i] * regN[j];
                 }
             }
         }
